@@ -53,7 +53,7 @@ npm start
 
 ```javascript
 // 引入监控SDK
-<script src="path/to/monitor-sdk.js"></script>
+<script src="../monitor/monitor-sdk.js"></script>
 
 // 初始化配置
 window.monitor.init({

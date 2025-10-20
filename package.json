@@ -2,11 +2,11 @@
   "name": "frontend-monitor-sdk",
   "version": "1.0.0",
   "description": "轻量级前端监控 SDK，支持错误监控、性能监控、用户行为监控",
-  "main": "monitor-sdk.js",
+  "main": "monitor/monitor-sdk.js",
   "scripts": {
-    "build": "uglifyjs monitor-sdk.js -o monitor-sdk.min.js -c -m --comments",
-    "dev": "node -e \"console.log('开发模式: 直接使用 monitor-sdk.js')\"",
-    "test": "echo \"在浏览器中打开 example.html 进行测试\" && open example.html"
+    "build": "uglifyjs monitor/monitor-sdk.js -o monitor/monitor-sdk.min.js -c -m --comments",
+    "dev": "node -e \"console.log('开发模式: 直接使用 monitor/monitor-sdk.js')\"",
+    "test": "echo \"在浏览器中打开 monitor/example.html 进行测试\" && open monitor/example.html"
   },
   "keywords": [
     "monitor",

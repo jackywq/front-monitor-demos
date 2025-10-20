@@ -18,7 +18,7 @@
 
 #### 方式一: Script 标签引入
 ```html
-<script src="./monitor-sdk.js"></script>
+<script src="./monitor/monitor-sdk.js"></script>
 <script>
     // 初始化监控
     Monitor.init({
@@ -34,7 +34,7 @@
 
 #### 方式二: ES6 Module
 ```javascript
-import Monitor from './monitor-sdk.js';
+import Monitor from './monitor/monitor-sdk.js';
 
 Monitor.init({
     reportUrl: 'https://your-api.com/report',
@@ -239,7 +239,7 @@ ignoreErrors: [
 npm install -g uglify-js
 
 # 压缩代码
-uglifyjs monitor-sdk.js -o monitor-sdk.min.js -c -m
+uglifyjs monitor/monitor-sdk.js -o monitor/monitor-sdk.min.js -c -m
 ```
 
 ### 测试

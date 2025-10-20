@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +13,14 @@
             padding: 20px;
             line-height: 1.6;
         }
+
         .demo-section {
             margin: 30px 0;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         button {
             padding: 10px 15px;
             margin: 5px;
@@ -27,40 +30,50 @@
             border-radius: 3px;
             cursor: pointer;
         }
+
         button:hover {
             background: #0056b3;
         }
+
         .error-btn {
             background: #dc3545;
         }
+
         .error-btn:hover {
             background: #c82333;
         }
+
         .form-group {
             margin: 10px 0;
         }
-        input, textarea {
+
+        input,
+        textarea {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
             border: 1px solid #ddd;
             border-radius: 3px;
         }
+
         .status {
             padding: 10px;
             margin: 10px 0;
             border-radius: 3px;
         }
+
         .status.success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .status.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
         .status.info {
             background: #d1ecf1;
             color: #0c5460;
@@ -68,9 +81,10 @@
         }
     </style>
 </head>
+
 <body>
     <h1>前端监控 SDK 示例</h1>
-    
+
     <div class="status info" id="status">
         监控 SDK 未初始化
     </div>
@@ -115,7 +129,7 @@
             </div>
             <button type="submit">提交表单</button>
         </form>
-        
+
         <div style="margin-top: 20px;">
             <button onclick="testClickBehavior()">测试点击行为</button>
             <button onclick="testPageView()">模拟页面跳转</button>
@@ -157,7 +171,7 @@
                     formSubmit: true
                 }
             });
-            
+
             monitorInitialized = Monitor.isInitialized();
             if (monitorInitialized) {
                 updateStatus('监控 SDK 初始化成功', 'success');
@@ -199,7 +213,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 触发一个 JavaScript 错误
             try {
                 throw new Error('这是一个测试的 JavaScript 错误');
@@ -214,7 +228,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 触发一个未处理的 Promise 错误
             Promise.reject(new Error('这是一个测试的 Promise 错误'));
             updateStatus('Promise 错误已触发并上报', 'success');
@@ -225,7 +239,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 手动上报自定义错误
             try {
                 throw new TypeError('这是一个自定义类型错误');
@@ -244,11 +258,11 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 创建一个不存在的图片资源来触发资源加载错误
             const img = new Image();
             img.src = 'https://example.com/nonexistent-image.jpg';
-            img.onerror = function() {
+            img.onerror = function () {
                 updateStatus('资源加载错误已触发并上报', 'success');
             };
             document.body.appendChild(img);
@@ -259,7 +273,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 模拟一个 API 错误请求
             fetch('https://httpbin.org/status/404')
                 .then(response => {
@@ -279,14 +293,14 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 手动触发性能数据上报
             Monitor.reportPerformance({
                 customMetric: Math.random() * 100,
-                pageLoadTime: performance.timing ? 
+                pageLoadTime: performance.timing ?
                     performance.timing.loadEventEnd - performance.timing.navigationStart : 0
             });
-            
+
             updateStatus('性能数据已手动上报', 'success');
         }
 
@@ -295,7 +309,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 上报自定义性能指标
             Monitor.reportPerformance({
                 userInteractionTime: Date.now() - performance.timing.navigationStart,
@@ -303,29 +317,29 @@
             }, {
                 customTag: 'user_defined'
             });
-            
+
             updateStatus('自定义性能数据已上报', 'success');
         }
 
         function handleFormSubmit(event) {
             event.preventDefault();
-            
+
             if (!monitorInitialized) {
                 updateStatus('请先初始化监控 SDK', 'error');
                 return false;
             }
-            
+
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
-            
+
             // 这里可以添加表单验证逻辑
             console.log('表单提交数据:', data);
-            
+
             updateStatus('表单提交行为已记录', 'success');
-            
+
             // 重置表单
             event.target.reset();
-            
+
             return false; // 阻止实际提交
         }
 
@@ -334,14 +348,14 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 手动上报点击行为
             Monitor.reportBehavior('custom_click', {
                 element: 'test_button',
                 text: '测试按钮',
                 timestamp: Date.now()
             });
-            
+
             updateStatus('点击行为已手动上报', 'success');
         }
 
@@ -350,12 +364,12 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 模拟页面跳转（使用 history API）
             history.pushState({}, '', '/new-page');
-            
+
             updateStatus('页面跳转行为已记录', 'success');
-            
+
             // 延迟后返回原页面
             setTimeout(() => {
                 history.back();
@@ -367,21 +381,21 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 这个错误应该被忽略（在配置中设置了忽略 "Ignored Error"）
             try {
                 throw new Error('Ignored Error - 这个错误应该被忽略');
             } catch (error) {
                 console.log('这个错误应该被忽略:', error.message);
             }
-            
+
             // 这个错误应该被上报
             try {
                 throw new Error('Normal Error - 这个错误应该被上报');
             } catch (error) {
                 console.log('这个错误应该被上报:', error.message);
             }
-            
+
             updateStatus('忽略错误配置测试完成', 'success');
         }
 
@@ -390,7 +404,7 @@
                 updateStatus('请先初始化监控 SDK', 'error');
                 return;
             }
-            
+
             // 测试采样率 - 连续触发多个错误
             for (let i = 0; i < 10; i++) {
                 try {
@@ -399,22 +413,23 @@
                     // 错误会被自动捕获和上报（根据采样率）
                 }
             }
-            
+
             updateStatus('采样率配置测试完成', 'success');
         }
 
         // 页面加载完成后自动初始化监控（可选）
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             // 可以在这里自动初始化，或者让用户手动初始化
             // initMonitor();
         });
 
         // 监听控制台输出，方便调试
         const originalConsoleLog = console.log;
-        console.log = function(...args) {
+        console.log = function (...args) {
             originalConsoleLog.apply(console, args);
             // 可以在这里添加日志显示逻辑
         };
     </script>
 </body>
+
 </html>
