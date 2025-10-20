@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端监控SDK + 可视化大盘集成示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .demo-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn.error {
+            background: #e74c3c;
+        }
+        
+        .btn.success {
+            background: #27ae60;
+        }
+        
+        .btn.warning {
+            background: #f39c12;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .status-value {
+            color: #6c757d;
+        }
+        
+        .status-value.online {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .status-value.offline {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .log-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .log-time {
+            color: #3498db;
+            margin-right: 10px;
+        }
+        
+        .log-type.info {
+            color: #3498db;
+        }
+        
+        .log-type.error {
+            color: #e74c3c;
+        }
+        
+        .log-type.success {
+            color: #27ae60;
+        }
+        
+        .dashboard-link {
+            display: inline-block;
+            background: #9b59b6;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-link:hover {
+            background: #8e44ad;
+            transform: translateY(-1px);
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>前端监控SDK + 可视化大盘集成示例</h1>
+            <p>实时演示监控数据采集、上报和可视化展示的全流程</p>
+        </div>
+
+        <!-- SDK初始化配置 -->
+        <div class="demo-section">
+            <h2>1. 监控SDK初始化</h2>
+            <div class="code-block">
+// 初始化监控SDK<br>
+window.monitor.init({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;appId: 'demo-app',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reportUrl: 'http://localhost:3000/api/monitor/report',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;samplingRate: 1,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;reportInterval: 5000<br>
+});
+            </div>
+            <button class="btn" onclick="initMonitor()">初始化监控SDK</button>
+            <div class="status-panel">
+                <div class="status-item">
+                    <span class="status-label">SDK状态:</span>
+                    <span class="status-value" id="sdk-status">未初始化</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">服务器状态:</span>
+                    <span class="status-value" id="server-status">检查中...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误监控演示 -->
+        <div class="demo-section">
+            <h2>2. 错误监控演示</h2>
+            <p>点击以下按钮模拟不同类型的错误，这些错误将被监控SDK捕获并上报到可视化大盘。</p>
+            <div class="button-group">
+                <button class="btn error" onclick="triggerJsError()">触发JavaScript错误</button>
+                <button class="btn error" onclick="triggerPromiseError()">触发Promise异常</button>
+                <button class="btn error" onclick="triggerResourceError()">触发资源加载错误</button>
+                <button class="btn error" onclick="triggerApiError()">触发API请求错误</button>
+            </div>
+        </div>
+
+        <!-- 性能监控演示 -->
+        <div class="demo-section">
+            <h2>3. 性能监控演示</h2>
+            <p>模拟页面性能数据采集和上报。</p>
+            <div class="button-group">
+                <button class="btn" onclick="simulatePageLoad()">模拟页面加载性能</button>
+                <button class="btn" onclick="simulateUserInteraction()">模拟用户交互性能</button>
+                <button class="btn" onclick="simulateApiPerformance()">模拟API性能</button>
+            </div>
+        </div>
+
+        <!-- 用户行为监控演示 -->
+        <div class="demo-section">
+            <h2>4. 用户行为监控演示</h2>
+            <p>模拟用户行为数据采集。</p>
+            <div class="form-group">
+                <label for="username">用户名:</label>
+                <input type="text" id="username" placeholder="请输入用户名">
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱:</label>
+                <input type="email" id="email" placeholder="请输入邮箱">
+            </div>
+            <div class="button-group">
+                <button class="btn success" onclick="simulateLogin()">模拟用户登录</button>
+                <button class="btn" onclick="simulateButtonClick()">模拟按钮点击</button>
+                <button class="btn" onclick="simulateFormSubmit()">模拟表单提交</button>
+                <button class="btn" onclick="simulatePageView()">模拟页面浏览</button>
+            </div>
+        </div>
+
+        <!-- 实时日志 -->
+        <div class="demo-section">
+            <h2>5. 实时监控日志</h2>
+            <p>显示SDK的实时操作日志和上报状态。</p>
+            <div class="log-container" id="log-container">
+                <div class="log-entry">
+                    <span class="log-time">[系统]</span>
+                    <span class="log-type info">INFO:</span>
+                    <span>监控演示页面已加载</span>
+                </div>
+            </div>
+            <button class="btn warning" onclick="clearLogs()">清空日志</button>
+        </div>
+
+        <!-- 可视化大盘链接 -->
+        <div class="demo-section" style="text-align: center;">
+            <h2>6. 查看可视化大盘</h2>
+            <p>点击下方链接查看实时监控数据的可视化展示</p>
+            <a href="http://localhost:3000" class="dashboard-link" target="_blank">
+                📊 打开监控数据可视化大盘
+            </a>
+            <div style="margin-top: 15px;">
+                <small>确保监控数据服务器正在运行 (端口 3000)</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入监控SDK -->
+    <script src="../monitor-sdk.js"></script>
+    
+    <script>
+        let monitorInitialized = false;
+        let logEntries = [];
+
+        // 添加日志
+        function addLog(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                time: timestamp,
+                type: type,
+                message: message
+            };
+            
+            logEntries.push(logEntry);
+            
+            // 更新日志显示
+            const logContainer = document.getElementById('log-container');
+            const logElement = document.createElement('div');
+            logElement.className = 'log-entry';
+            logElement.innerHTML = `
+                <span class="log-time">[${timestamp}]</span>
+                <span class="log-type ${type}">${type.toUpperCase()}:</span>
+                <span>${message}</span>
+            `;
+            
+            logContainer.appendChild(logElement);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // 保持最多100条日志
+            if (logEntries.length > 100) {
+                logEntries.shift();
+                if (logContainer.children.length > 100) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            }
+        }
+
+        // 检查服务器状态
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:3000/api/health');
+                if (response.ok) {
+                    document.getElementById('server-status').textContent = '在线';
+                    document.getElementById('server-status').className = 'status-value online';
+                    return true;
+                }
+            } catch (error) {
+                document.getElementById('server-status').textContent = '离线';
+                document.getElementById('server-status').className = 'status-value offline';
+                addLog('error', `服务器连接失败: ${error.message}`);
+                return false;
+            }
+        }
+
+        // 初始化监控SDK
+        function initMonitor() {
+            if (monitorInitialized) {
+                addLog('info', '监控SDK已经初始化');
+                return;
+            }
+
+            try {
+                window.monitor.init({
+                    appId: 'demo-app',
+                    reportUrl: 'http://localhost:3000/api/monitor/report',
+                    samplingRate: 1,
+                    reportInterval: 5000,
+                    maxBatchSize: 5,
+                    maxRetryCount: 2
+                });
+                
+                monitorInitialized = true;
+                document.getElementById('sdk-status').textContent = '已初始化';
+                document.getElementById('sdk-status').className = 'status-value online';
+                addLog('success', '监控SDK初始化成功');
+                
+                // 检查服务器状态
+                checkServerStatus();
+                
+            } catch (error) {
+                addLog('error', `监控SDK初始化失败: ${error.message}`);
+            }
+        }
+
+        // 触发JavaScript错误
+        function triggerJsError() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '触发JavaScript错误...');
+            
+            // 模拟未定义变量错误
+            try {
+                console.log(undefinedVariable);
+            } catch (error) {
+                addLog('error', `JavaScript错误已触发: ${error.message}`);
+            }
+        }
+
+        // 触发Promise异常
+        function triggerPromiseError() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '触发Promise异常...');
+            
+            // 模拟Promise拒绝
+            Promise.reject(new Error('模拟Promise拒绝错误'))
+                .catch(error => {
+                    addLog('error', `Promise异常已触发: ${error.message}`);
+                });
+        }
+
+        // 触发资源加载错误
+        function triggerResourceError() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '触发资源加载错误...');
+            
+            // 模拟图片加载失败
+            const img = new Image();
+            img.onerror = function() {
+                addLog('error', '资源加载错误已触发: 图片加载失败');
+            };
+            img.src = 'https://invalid-url.com/nonexistent-image.jpg';
+        }
+
+        // 触发API请求错误
+        function triggerApiError() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '触发API请求错误...');
+            
+            // 模拟API请求失败
+            fetch('https://invalid-api.com/nonexistent-endpoint')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    addLog('error', `API请求错误已触发: ${error.message}`);
+                });
+        }
+
+        // 模拟页面加载性能
+        function simulatePageLoad() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '模拟页面加载性能数据...');
+            
+            // 模拟性能数据
+            setTimeout(() => {
+                addLog('success', '页面加载性能数据已模拟');
+            }, 100);
+        }
+
+        // 模拟用户交互性能
+        function simulateUserInteraction() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '模拟用户交互性能数据...');
+            
+            // 模拟用户点击行为
+            setTimeout(() => {
+                addLog('success', '用户交互性能数据已模拟');
+            }, 50);
+        }
+
+        // 模拟API性能
+        function simulateApiPerformance() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '模拟API性能数据...');
+            
+            // 模拟API调用
+            setTimeout(() => {
+                addLog('success', 'API性能数据已模拟');
+            }, 200);
+        }
+
+        // 模拟用户登录
+        function simulateLogin() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            const username = document.getElementById('username').value || 'demo-user';
+            addLog('info', `模拟用户登录: ${username}`);
+            
+            setTimeout(() => {
+                addLog('success', `用户登录行为已记录: ${username}`);
+            }, 100);
+        }
+
+        // 模拟按钮点击
+        function simulateButtonClick() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '模拟按钮点击行为...');
+            
+            setTimeout(() => {
+                addLog('success', '按钮点击行为已记录');
+            }, 50);
+        }
+
+        // 模拟表单提交
+        function simulateFormSubmit() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            const email = document.getElementById('email').value || 'demo@example.com';
+            addLog('info', `模拟表单提交: ${email}`);
+            
+            setTimeout(() => {
+                addLog('success', `表单提交行为已记录: ${email}`);
+            }, 150);
+        }
+
+        // 模拟页面浏览
+        function simulatePageView() {
+            if (!monitorInitialized) {
+                addLog('error', '请先初始化监控SDK');
+                return;
+            }
+            
+            addLog('info', '模拟页面浏览行为...');
+            
+            setTimeout(() => {
+                addLog('success', '页面浏览行为已记录');
+            }, 100);
+        }
+
+        // 清空日志
+        function clearLogs() {
+            logEntries = [];
+            const logContainer = document.getElementById('log-container');
+            logContainer.innerHTML = '<div class="log-entry"><span class="log-time">[系统]</span><span class="log-type info">INFO:</span><span>日志已清空</span></div>';
+            addLog('info', '日志容器已清空');
+        }
+
+        // 页面加载时自动检查服务器状态
+        window.addEventListener('load', function() {
+            addLog('info', '页面加载完成，开始检查服务器状态...');
+            checkServerStatus();
+        });
+
+        // 添加一些示例错误监控（即使SDK未初始化也会被捕获）
+        window.addEventListener('error', function(event) {
+            if (monitorInitialized) {
+                addLog('info', `全局错误监控捕获: ${event.message}`);
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            if (monitorInitialized) {
+                addLog('info', `Promise拒绝监控捕获: ${event.reason}`);
+            }
+        });
+    </script>
+</body>
+</html>

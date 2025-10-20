@@ -1,0 +1,92 @@
+# 依赖目录
+node_modules/
+dashboard/node_modules/
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率目录
+coverage/
+.nyc_output
+
+# 依赖锁定文件 (可选，根据团队规范决定是否忽略)
+# package-lock.json
+# yarn.lock
+
+# 编译输出
+dist/
+build/
+*.tsbuildinfo
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 监控数据文件 (包含敏感信息)
+dashboard/data/
+!dashboard/data/.gitkeep
+
+# 临时文件
+*.tmp
+*.temp
+
+# 压缩文件
+*.gz
+*.tar
+*.zip
+
+# 测试相关
+/test-results/
+/coverage/
+
+# 构建产物
+monitor-sdk.min.js
+
+# 缓存目录
+.cache/
+.parcel-cache/
+
+# 类型Script编译输出
+*.js.map
+*.d.ts
+
+# 包管理器特定文件
+.npm
+.eslintcache
+
+# 可选：忽略示例文件（如果不需要提交示例）
+# example.html
+# integration-example.html
+
+# 可选：忽略文档构建输出
+_site/
+.sass-cache/
+.jekyll-metadata
