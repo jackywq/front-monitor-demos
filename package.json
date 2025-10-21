@@ -6,7 +6,11 @@
   "scripts": {
     "build": "uglifyjs monitor/monitor-sdk.js -o monitor/monitor-sdk.min.js -c -m --comments",
     "dev": "node -e \"console.log('开发模式: 直接使用 monitor/monitor-sdk.js')\"",
-    "test": "echo \"在浏览器中打开 monitor/example.html 进行测试\" && open monitor/example.html"
+    "test": "echo \"在浏览器中打开 monitor/example.html 进行测试\" && open monitor/example.html",
+    "dashboard:install": "cd dashboard && npm install",
+    "dashboard:start": "cd dashboard && npm start",
+    "dashboard:dev": "cd dashboard && npm run dev",
+    "start": "concurrently \"npm run dashboard:start\""
   },
   "keywords": [
     "monitor",
@@ -19,7 +23,8 @@
   "author": "Frontend Monitor Team",
   "license": "MIT",
   "devDependencies": {
-    "uglify-js": "^3.17.4"
+    "uglify-js": "^3.17.4",
+    "concurrently": "^7.6.0"
   },
   "repository": {
     "type": "git",
