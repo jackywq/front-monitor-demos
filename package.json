@@ -4,7 +4,9 @@
   "description": "轻量级前端监控 SDK，支持错误监控、性能监控、用户行为监控",
   "main": "monitor/monitor-sdk.js",
   "scripts": {
-    "build:monitor": "uglifyjs monitor-core/monitor-sdk.js -o monitor-core/monitor-sdk.min.js -c -m --comments",
+    "build:monitor": "cd monitor-core && npm run build",
+    "monitor:install": "cd monitor-core && npm install",
+    "monitor:dev": "cd monitor-core && npm run dev",
     "dashboard:install": "cd monitor-dashboard && npm install",
     "dashboard:start": "cd monitor-dashboard && npm start",
     "dashboard:dev": "cd monitor-dashboard && npm run dev",
@@ -12,7 +14,7 @@
     "playground:dev": "cd monitor-playground && npm run dev",
     "playground:build": "cd monitor-playground && npm run build",
     "playground:preview": "cd monitor-playground && npm run preview",
-    "start": "concurrently \"npm run dashboard:start\" \"npm run playground:preview\""
+    "start": "concurrently \"npm run dashboard:start\" \"npm run playground:dev\""
   },
   "keywords": [
     "monitor",

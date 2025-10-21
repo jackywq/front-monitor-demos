@@ -1,64 +1,59 @@
-# 前端监控 SDK - 代码设计思路
+# 前端监控 SDK - 工程化架构
 
 ## 📋 项目概述
 
-`monitor-core` 是前端监控系统的核心 SDK 模块，负责在客户端收集、处理和上报各种监控数据。采用模块化设计，支持错误监控、性能监控、用户行为监控等功能。
+`monitor-core` 是前端监控系统的核心 SDK 模块，采用现代化的工程化架构设计。负责在客户端收集、处理和上报各种监控数据，支持错误监控、性能监控、用户行为监控等功能。
 
-## 🏗️ 架构设计
+## 🏗️ 工程化架构
 
-### 1. 模块化架构
+### 1. 项目结构
 
-SDK 采用分层模块化设计，主要包含以下核心模块：
+项目采用标准的工程化目录结构，按功能模块分类组织代码：
 
 ```
-Monitor SDK
-├── 工具函数层 (utils)
-├── 数据队列层 (DataQueue)
-├── 监控模块层
-│   ├── 错误监控 (ErrorMonitor)
-│   ├── 性能监控 (PerformanceMonitor)
-│   └── 用户行为监控 (BehaviorMonitor)
-└── 主控制层 (Monitor)
+monitor-core/
+├── src/                    # 源代码目录
+│   ├── core/              # 核心模块
+│   │   ├── DataQueue.js   # 数据队列管理
+│   │   └── Monitor.js     # 主监控类
+│   ├── modules/           # 监控模块
+│   │   ├── ErrorMonitor.js      # 错误监控
+│   │   ├── PerformanceMonitor.js # 性能监控
+│   │   └── BehaviorMonitor.js   # 用户行为监控
+│   ├── utils/             # 工具函数
+│   │   └── index.js       # 工具函数集合
+│   └── index.js          # 入口文件
+├── dist/                  # 构建输出目录
+│   ├── monitor-sdk.js     # UMD 格式
+│   ├── monitor-sdk.esm.js # ES 模块格式
+│   └── monitor-sdk.min.js # 压缩版本
+├── package.json          # 项目配置
+├── rollup.config.js      # 构建配置
+└── tsconfig.json         # TypeScript 配置
 ```
 
-### 2. UMD 模块规范支持
+### 2. 构建系统
 
-SDK 支持多种模块加载方式，确保在各种环境中都能正常工作：
+使用 Rollup 作为构建工具，支持多种输出格式：
 
-```javascript
-// AMD 规范
-if (typeof define === "function" && define.amd) {
-    define(factory);
-} 
-// CommonJS 规范  
-else if (typeof module === "object" && module.exports) {
-    module.exports = factory();
-}
-// 浏览器全局变量
-else {
-    global.Monitor = factory();
-}
-```
+- **UMD 格式** (`monitor-sdk.js`)：通用模块定义，支持浏览器和Node.js
+- **ES 模块格式** (`monitor-sdk.esm.js`)：现代模块系统，支持 tree-shaking
+- **压缩版本** (`monitor-sdk.min.js`)：生产环境使用，体积优化
 
 ## 🔧 核心模块设计
 
-### 1. 工具函数模块 (utils)
+### 1. 工具函数模块 (utils/index.js)
 
-**设计目标**：提供通用的工具函数，避免代码重复，提高可维护性。
+**设计目标**：提供通用的工具函数，支持模块化开发。
 
 **核心功能**：
+- `DEFAULT_CONFIG` - 默认配置对象
+- `deepMerge()` - 深度合并配置对象
 - `now()` - 获取当前时间戳
 - `generateId()` - 生成唯一ID
-- `safeStringify()` - 安全的JSON序列化
-- `deepMerge()` - 深度合并配置对象
-- `shouldSample()` - 采样率判断
+- `isFunction()`, `isObject()`, `isArray()` - 类型判断函数
 
-**设计特点**：
-- 纯函数设计，无副作用
-- 函数职责单一，易于测试
-- 错误处理完善，避免运行时崩溃
-
-### 2. 数据队列模块 (DataQueue)
+### 2. 数据队列模块 (core/DataQueue.js)
 
 **设计目标**：高效管理监控数据，支持批量上报和页面卸载时数据保护。
 
@@ -72,35 +67,8 @@ else {
 1. **立即上报**：队列达到最大容量时
 2. **定时上报**：配置的时间间隔触发
 3. **页面卸载上报**：使用 `navigator.sendBeacon` 确保数据不丢失
-4. **降级方案**：使用 Image 对象进行上报
 
-```javascript
-class DataQueue {
-    constructor(config) {
-        this.config = config;
-        this.queue = [];
-        this.timer = null;
-        this.init();
-    }
-    
-    // 数据上报策略
-    report(data) {
-        // 优先使用 sendBeacon（支持页面卸载）
-        if (navigator.sendBeacon) {
-            const blob = new Blob([utils.safeStringify(reportData)], {
-                type: "application/json",
-            });
-            navigator.sendBeacon(this.config.reportUrl, blob);
-        } else {
-            // 降级方案：使用 Image 对象
-            const img = new Image();
-            img.src = this.config.reportUrl + "?data=" + encodeURIComponent(data);
-        }
-    }
-}
-```
-
-### 3. 错误监控模块 (ErrorMonitor)
+### 3. 错误监控模块 (modules/ErrorMonitor.js)
 
 **设计目标**：全面捕获前端运行时错误，提供详细的错误上下文信息。
 
@@ -110,85 +78,16 @@ class DataQueue {
 - **资源加载错误**：监控图片、脚本、样式表等资源加载失败
 - **API 接口错误**：拦截 XMLHttpRequest 和 fetch 请求
 
-**错误拦截设计**：
-
-#### XMLHttpRequest 拦截
-```javascript
-interceptXHR() {
-    const originalXHR = window.XMLHttpRequest;
-    
-    window.XMLHttpRequest = function () {
-        const xhr = new originalXHR();
-        // 重写 open 和 send 方法
-        // 添加错误监控逻辑
-        return xhr;
-    };
-}
-```
-
-#### Fetch 拦截
-```javascript
-interceptFetch() {
-    const originalFetch = window.fetch;
-    
-    window.fetch = function (...args) {
-        return originalFetch.apply(this, args)
-            .then(response => {
-                if (!response.ok) {
-                    // 记录接口错误
-                    this.queue.add(errorData);
-                }
-                return response;
-            })
-            .catch(error => {
-                // 记录网络错误
-                this.queue.add(errorData);
-                throw error;
-            });
-    };
-}
-```
-
-**错误过滤机制**：
-- 支持配置忽略错误模式
-- 自动过滤跨域脚本错误
-- 支持正则表达式匹配忽略规则
-
-### 4. 性能监控模块 (PerformanceMonitor)
+### 4. 性能监控模块 (modules/PerformanceMonitor.js)
 
 **设计目标**：收集页面加载性能指标和用户体验相关数据。
 
 **监控指标**：
+- **传统性能指标**：DNS查询、TCP连接、请求响应等耗时
+- **资源加载性能**：图片、脚本、样式表等资源加载时间
+- **Web Vitals 指标**：LCP、FID、CLS等核心用户体验指标
 
-#### 传统性能指标
-- **DNS 查询耗时**：`domainLookupEnd - domainLookupStart`
-- **TCP 连接耗时**：`connectEnd - connectStart`
-- **请求响应耗时**：`responseEnd - requestStart`
-- **DOM 解析耗时**：`domComplete - domLoading`
-- **白屏时间**：`responseStart - navigationStart`
-- **页面完全加载时间**：`loadEventEnd - navigationStart`
-
-#### Web Vitals 核心指标
-- **LCP (最大内容绘制)**：使用 PerformanceObserver 监控
-- **FID (首次输入延迟)**：监控用户首次交互响应时间
-- **CLS (累积布局偏移)**：监控页面布局稳定性
-
-**数据采集时机**：
-```javascript
-init() {
-    if (document.readyState === "complete") {
-        this.collectPerformance();
-    } else {
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                this.collectPerformance();
-            }, 0);
-        });
-    }
-}
-```
-
-### 5. 用户行为监控模块 (BehaviorMonitor)
+### 5. 用户行为监控模块 (modules/BehaviorMonitor.js)
 
 **设计目标**：跟踪用户在页面上的交互行为，分析用户行为路径。
 
@@ -197,156 +96,250 @@ init() {
 - **页面浏览**：监控路由变化和页面跳转
 - **表单提交**：监控表单提交行为
 
-**路由监控设计**：
-```javascript
-overrideHistory() {
-    // 重写 history.pushState 和 history.replaceState
-    // 添加自定义事件触发页面浏览记录
-}
-```
-
-**事件过滤**：
-- 自动过滤脚本、样式等非交互元素
-- 支持扩展忽略规则
-- 防止监控数据过多影响性能
-
-### 6. 主监控类 (Monitor)
+### 6. 主监控类 (core/Monitor.js)
 
 **设计目标**：统一管理所有监控模块，提供简洁的 API 接口。
 
-**生命周期管理**：
+**核心方法**：
+- `init(userConfig)` - 初始化监控
+- `reportError(error, customData)` - 手动上报错误
+- `reportPerformance(metrics, customData)` - 手动上报性能数据
+- `reportBehavior(behaviorType, data)` - 手动上报用户行为
+- `flush()` - 立即上报所有数据
+- `destroy()` - 销毁监控实例
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+
+```bash
+cd monitor-core
+npm install
+```
+
+### 2. 构建 SDK
+
+```bash
+# 开发构建
+npm run build
+
+# 开发模式（监听文件变化）
+npm run dev
+```
+
+### 3. 在项目中使用
+
+**HTML 引入方式**：
+```html
+<script src="dist/monitor-sdk.js"></script>
+<script>
+// 初始化监控
+window.Monitor.init({
+    reportUrl: 'https://api.example.com/monitor',
+    appId: 'your-app-id',
+    monitorErrors: true,
+    monitorPerformance: true,
+    monitorBehavior: false
+});
+</script>
+```
+
+**ES 模块方式**：
 ```javascript
-class Monitor {
-    // 初始化
-    init(userConfig) {
-        // 合并配置
-        // 初始化各监控模块
-        // 设置初始化状态
-    }
+import { Monitor } from 'monitor-core';
+
+const monitor = new Monitor();
+monitor.init({
+    reportUrl: 'https://api.example.com/monitor',
+    appId: 'your-app-id'
+});
+```
+
+## 📊 配置选项
+
+```javascript
+const config = {
+    // 必填：数据上报地址
+    reportUrl: "",
     
-    // 销毁
-    destroy() {
-        // 清理各模块
-        // 恢复被重写的方法
-        // 重置状态
-    }
-}
-```
-
-**API 设计原则**：
-- 方法命名清晰直观
-- 参数配置灵活
-- 错误处理完善
-- 向后兼容性强
-
-## 🎯 设计亮点
-
-### 1. 性能优化设计
-- **采样率控制**：支持配置采样率，避免数据量过大
-- **批量上报**：减少网络请求次数
-- **懒加载机制**：按需初始化监控模块
-- **内存管理**：及时清理无用数据
-
-### 2. 错误恢复设计
-- **降级方案**：当高级特性不可用时自动降级
-- **错误隔离**：各模块错误互不影响
-- **资源释放**：提供完整的销毁机制
-
-### 3. 可扩展性设计
-- **插件化架构**：易于添加新的监控类型
-- **配置驱动**：通过配置控制功能开关
-- **钩子函数**：支持自定义处理逻辑
-
-### 4. 兼容性设计
-- **多环境支持**：UMD 模块规范
-- **浏览器兼容**：优雅降级处理
-- **TypeScript 友好**：提供完整的类型定义
-
-## 🔄 数据流设计
-
-```
-数据产生 → 数据收集 → 数据处理 → 数据上报
-    ↓          ↓          ↓          ↓
-用户交互   事件监听   数据格式化   批量发送
-系统错误   错误捕获   采样过滤   错误重试
-性能指标   性能API   指标计算   优先级控制
-```
-
-## 📊 配置系统
-
-SDK 提供灵活的配置系统：
-
-```javascript
-const DEFAULT_CONFIG = {
-    reportUrl: "http://localhost:3000/api/monitor/report",
+    // 应用标识
     appId: "",
+    userId: "",
+    version: "1.0.0",
+    environment: "production",
+    
+    // 功能开关
     monitorErrors: true,
     monitorPerformance: true,
     monitorBehavior: false,
-    sampleRate: 1.0,
-    ignoreErrors: [],
-    maxBatchSize: 10,
+    
+    // 采样率控制 (0-1)
+    sampleRate: 1,
+    
+    // 队列配置
+    maxQueueSize: 100,
     reportInterval: 10000,
-    enableSourceMap: false,
+    
+    // 错误忽略列表
+    ignoreErrors: [],
+    
+    // 性能监控配置
+    performance: {
+        resourceTiming: true,
+        webVitals: true,
+    },
+    
+    // 用户行为监控配置
     userBehavior: {
-        click: true,
-        pageView: true,
-        formSubmit: true,
+        click: false,
+        pageView: false,
+        formSubmit: false,
     },
 };
-```
-
-## 🚀 使用示例
-
-```javascript
-// 初始化监控
-window.Monitor.init({
-    appId: 'your-app-id',
-    reportUrl: 'https://api.example.com/monitor',
-    monitorErrors: true,
-    monitorPerformance: true,
-    sampleRate: 0.5
-});
-
-// 手动上报自定义数据
-window.Monitor.reportBehavior('custom_event', {
-    category: 'user_action',
-    label: 'button_click'
-});
-
-// 销毁监控（SPA 应用路由切换时）
-window.Monitor.destroy();
 ```
 
 ## 🔧 开发指南
 
 ### 构建命令
-```bash
-# 开发版本
-npm run build:monitor
 
-# 生产版本（压缩）
-npm run build:monitor:min
+```bash
+# 安装依赖
+npm install
+
+# 构建所有版本
+npm run build
+
+# 开发模式（监听文件变化）
+npm run dev
+
+# 代码检查
+npm run lint
+
+# 运行测试
+npm run test
 ```
 
-### 代码规范
-- 使用 ESLint + Prettier 保证代码质量
-- 遵循 JavaScript Standard Style
-- 添加详细的 JSDoc 注释
+### 根目录构建
 
-## 📈 性能考虑
+在项目根目录可以使用统一的构建命令：
 
-1. **SDK 大小**：压缩后约 8KB
-2. **内存占用**：队列机制控制内存使用
-3. **CPU 影响**：事件监听使用 passive 模式
-4. **网络影响**：批量上报减少请求次数
+```bash
+# 安装监控SDK依赖
+npm run monitor:install
 
-## 🔮 未来规划
+# 构建监控SDK
+npm run build:monitor
 
-- [ ] 支持更多的性能指标（FCP、TTI等）
-- [ ] 集成异常检测算法
-- [ ] 支持实时数据流分析
-- [ ] 提供可视化配置界面
+# 监控SDK开发模式
+npm run monitor:dev
+```
+
+### 模块扩展
+
+添加新的监控模块：
+
+1. 在 `src/modules/` 目录创建新的模块文件
+2. 实现模块类，包含 `init()` 和 `destroy()` 方法
+3. 在 `core/Monitor.js` 中集成新模块
+4. 更新配置选项支持新功能
+
+## 📈 性能优化
+
+### 1. 代码体积
+- 使用 Rollup 进行 tree-shaking
+- 压缩版本减少文件大小
+- 按需加载监控模块
+
+### 2. 运行时性能
+- 批量上报减少网络请求
+- 采样率控制数据量
+- 被动事件监听避免阻塞
+
+### 3. 内存管理
+- 队列机制控制内存使用
+- 及时清理无用数据
+- 提供完整的销毁接口
+
+## 🔮 API 参考
+
+### Monitor 类
+
+#### init(userConfig)
+初始化监控SDK。
+
+**参数**：
+- `userConfig` (Object): 用户配置对象
+
+**示例**：
+```javascript
+window.Monitor.init({
+    reportUrl: 'https://api.example.com/monitor',
+    appId: 'your-app-id'
+});
+```
+
+#### reportError(error, customData)
+手动上报错误信息。
+
+**参数**：
+- `error` (Error): 错误对象
+- `customData` (Object): 自定义数据
+
+#### reportPerformance(metrics, customData)
+手动上报性能数据。
+
+**参数**：
+- `metrics` (Object): 性能指标数据
+- `customData` (Object): 自定义数据
+
+#### reportBehavior(behaviorType, data)
+手动上报用户行为。
+
+**参数**：
+- `behaviorType` (String): 行为类型
+- `data` (Object): 行为数据
+
+#### flush()
+立即上报所有缓存数据。
+
+#### destroy()
+销毁监控实例，清理资源。
+
+#### getConfig()
+获取当前配置。
+
+#### isInitialized()
+检查是否已初始化。
+
+## 🎯 设计原则
+
+### 1. 模块化设计
+- 每个功能模块独立，职责单一
+- 易于测试和维护
+- 支持按需加载
+
+### 2. 工程化标准
+- 使用现代构建工具
+- 支持多种模块格式
+- 完整的开发工具链
+
+### 3. 兼容性考虑
+- UMD 模块规范支持
+- 浏览器兼容性处理
+- 优雅降级策略
+
+### 4. 可扩展性
+- 插件化架构设计
+- 配置驱动功能开关
+- 易于添加新功能
+
+## 📄 许可证
+
+MIT License
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
 
 ---
 
