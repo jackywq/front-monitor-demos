@@ -1,0 +1,1 @@
+../../monitor-core/dist/monitor-sdk.js

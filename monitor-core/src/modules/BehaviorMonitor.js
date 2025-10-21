@@ -41,9 +41,7 @@ export class BehaviorMonitor {
         const clickData = {
           type: "click",
           element: target.tagName.toLowerCase(),
-          text: target.textContent
-            ? target.textContent.substring(0, 100)
-            : "",
+          text: target.textContent ? target.textContent.substring(0, 100) : "",
           className: target.className || "",
           id: target.id || "",
           x: event.clientX,
