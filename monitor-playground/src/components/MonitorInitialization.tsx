@@ -1,10 +1,20 @@
 import React from "react";
 import { Card, Button, Space, Typography, Tag } from "antd";
-import { PlayCircleOutlined, StopOutlined, SyncOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { PlayCircleOutlined, CheckCircleOutlined, StopOutlined, SyncOutlined } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const MonitorInitialization = ({ monitorInitialized, setMonitorInitialized, updateStatus }) => {
+interface MonitorInitializationProps {
+  monitorInitialized: boolean;
+  setMonitorInitialized: (initialized: boolean) => void;
+  updateStatus: (message: string, type?: "info" | "success" | "error") => void;
+}
+
+const MonitorInitialization: React.FC<MonitorInitializationProps> = ({ 
+  monitorInitialized, 
+  setMonitorInitialized, 
+  updateStatus 
+}) => {
   // 初始化监控
   const initMonitor = () => {
     if (window.Monitor) {

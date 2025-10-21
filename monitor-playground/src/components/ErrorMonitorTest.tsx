@@ -1,10 +1,24 @@
 import React from "react";
 import { Card, Button, Space, Typography, Tag, Alert } from "antd";
-import { BugOutlined, WarningOutlined, ThunderboltOutlined, ApiOutlined, FileImageOutlined } from "@ant-design/icons";
+import {
+  BugOutlined,
+  WarningOutlined,
+  ThunderboltOutlined,
+  ApiOutlined,
+  FileImageOutlined,
+} from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const ErrorMonitorTest = ({ monitorInitialized, updateStatus }) => {
+interface ErrorMonitorTestProps {
+  monitorInitialized: boolean;
+  updateStatus: (message: string, type?: "info" | "success" | "error") => void;
+}
+
+const ErrorMonitorTest: React.FC<ErrorMonitorTestProps> = ({
+  monitorInitialized,
+  updateStatus,
+}) => {
   // 测试JavaScript错误
   const testJSError = () => {
     if (!monitorInitialized) {
@@ -41,11 +55,16 @@ const ErrorMonitorTest = ({ monitorInitialized, updateStatus }) => {
     try {
       throw new TypeError("这是一个自定义类型错误");
     } catch (error) {
-      window.Monitor.reportError(error, {
-        customField: "自定义数据",
-        userId: "12345",
-        page: "demo.html",
-      });
+      if (window.Monitor) {
+        window.Monitor.reportError(
+          error instanceof Error ? error : String(error),
+          {
+            customField: "自定义数据",
+            userId: "12345",
+            page: "demo.html",
+          }
+        );
+      }
       updateStatus("自定义错误已手动上报", "success");
     }
   };
@@ -96,9 +115,10 @@ const ErrorMonitorTest = ({ monitorInitialized, updateStatus }) => {
       style={{ height: "100%" }}
     >
       <Text type="secondary" style={{ marginBottom: 16, display: "block" }}>
-        测试各种类型的错误监控功能，包括 JavaScript 错误、Promise 错误、资源加载错误等
+        测试各种类型的错误监控功能，包括 JavaScript 错误、Promise
+        错误、资源加载错误等
       </Text>
-      
+
       {!monitorInitialized && (
         <Alert
           message="请先初始化监控 SDK"
@@ -107,46 +127,46 @@ const ErrorMonitorTest = ({ monitorInitialized, updateStatus }) => {
           style={{ marginBottom: 16 }}
         />
       )}
-      
+
       <Space direction="vertical" style={{ width: "100%" }}>
-        <Button 
-          icon={<BugOutlined />} 
+        <Button
+          icon={<BugOutlined />}
           onClick={testJSError}
           block
           disabled={!monitorInitialized}
         >
           触发 JavaScript 错误
         </Button>
-        
-        <Button 
-          icon={<ThunderboltOutlined />} 
+
+        <Button
+          icon={<ThunderboltOutlined />}
           onClick={testPromiseError}
           block
           disabled={!monitorInitialized}
         >
           触发 Promise 错误
         </Button>
-        
-        <Button 
-          icon={<WarningOutlined />} 
+
+        <Button
+          icon={<WarningOutlined />}
           onClick={testCustomError}
           block
           disabled={!monitorInitialized}
         >
           手动上报错误
         </Button>
-        
-        <Button 
-          icon={<FileImageOutlined />} 
+
+        <Button
+          icon={<FileImageOutlined />}
           onClick={testResourceError}
           block
           disabled={!monitorInitialized}
         >
           触发资源加载错误
         </Button>
-        
-        <Button 
-          icon={<ApiOutlined />} 
+
+        <Button
+          icon={<ApiOutlined />}
           onClick={testAPIError}
           block
           disabled={!monitorInitialized}
@@ -154,7 +174,7 @@ const ErrorMonitorTest = ({ monitorInitialized, updateStatus }) => {
           触发 API 错误
         </Button>
       </Space>
-      
+
       <Alert
         message="安全提示"
         description="这些测试会触发真实的错误，但不会影响页面正常功能"

@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Card, Row, Col, Typography, Alert, Space, Divider } from "antd";
-import {
-  PlayCircleOutlined,
-  BugOutlined,
-  DashboardOutlined,
-  UserOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { Layout, Row, Col, Typography, Alert } from "antd";
+import { DashboardOutlined } from "@ant-design/icons";
 
 import MonitorInitialization from "./components/MonitorInitialization";
 import ErrorMonitorTest from "./components/ErrorMonitorTest";
@@ -17,15 +11,22 @@ import ConfigMonitorTest from "./components/ConfigMonitorTest";
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
-function App() {
-  const [monitorInitialized, setMonitorInitialized] = useState(false);
-  const [status, setStatus] = useState({
+interface Status {
+  message: string;
+  type: "info" | "success" | "error";
+}
+
+interface AppProps {}
+
+const App: React.FC<AppProps> = () => {
+  const [monitorInitialized, setMonitorInitialized] = useState<boolean>(false);
+  const [status, setStatus] = useState<Status>({
     message: "监控 SDK 未初始化",
     type: "info",
   });
 
   // 更新状态显示
-  const updateStatus = (message, type = "info") => {
+  const updateStatus = (message: string, type: Status["type"] = "info") => {
     setStatus({ message, type });
   };
 
@@ -52,7 +53,9 @@ function App() {
     <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
       <Header style={{ background: "#001529", padding: "0 24px" }}>
         <div style={{ display: "flex", alignItems: "center", height: "64px" }}>
-          <DashboardOutlined style={{ fontSize: "24px", color: "#fff", marginRight: "16px" }} />
+          <DashboardOutlined
+            style={{ fontSize: "24px", color: "#fff", marginRight: "16px" }}
+          />
           <Title level={3} style={{ color: "#fff", margin: 0 }}>
             前端监控 SDK 演示平台
           </Title>
@@ -63,7 +66,13 @@ function App() {
         {/* 状态显示 */}
         <Alert
           message={status.message}
-          type={status.type === "error" ? "error" : status.type === "success" ? "success" : "info"}
+          type={
+            status.type === "error"
+              ? "error"
+              : status.type === "success"
+              ? "success"
+              : "info"
+          }
           showIcon
           style={{ marginBottom: "24px" }}
         />
@@ -113,6 +122,6 @@ function App() {
       </Content>
     </Layout>
   );
-}
+};
 
 export default App;

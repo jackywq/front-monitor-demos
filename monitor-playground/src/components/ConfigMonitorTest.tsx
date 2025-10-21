@@ -2,9 +2,14 @@ import React from "react";
 import { Card, Button, Space, Typography, Tag, Alert, Descriptions } from "antd";
 import { SettingOutlined, FilterOutlined, PercentageOutlined, ExperimentOutlined } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const ConfigMonitorTest = ({ monitorInitialized, updateStatus }) => {
+interface ConfigMonitorTestProps {
+  monitorInitialized: boolean;
+  updateStatus: (message: string, type?: "info" | "success" | "error") => void;
+}
+
+const ConfigMonitorTest: React.FC<ConfigMonitorTestProps> = ({ monitorInitialized, updateStatus }) => {
   // 测试忽略错误配置
   const testIgnoreErrors = () => {
     if (!monitorInitialized) {
@@ -15,13 +20,13 @@ const ConfigMonitorTest = ({ monitorInitialized, updateStatus }) => {
     try {
       throw new Error("Ignored Error - 这个错误应该被忽略");
     } catch (error) {
-      console.log("这个错误应该被忽略:", error.message);
+      console.log("这个错误应该被忽略:", (error as Error).message);
     }
 
     try {
       throw new Error("Normal Error - 这个错误应该被上报");
     } catch (error) {
-      console.log("这个错误应该被上报:", error.message);
+      console.log("这个错误应该被上报:", (error as Error).message);
     }
 
     updateStatus("忽略错误配置测试完成", "success");
@@ -52,11 +57,13 @@ const ConfigMonitorTest = ({ monitorInitialized, updateStatus }) => {
       return;
     }
 
-    const config = window.Monitor.getConfig();
-    updateStatus("当前配置信息已显示", "success");
-    
-    // 这里可以显示配置详情，但为了简洁，我们只更新状态
-    console.log("当前监控配置:", config);
+    if (window.Monitor) {
+      const config = window.Monitor.getConfig();
+      updateStatus("当前配置信息已显示", "success");
+      
+      // 这里可以显示配置详情，但为了简洁，我们只更新状态
+      console.log("当前监控配置:", config);
+    }
   };
 
   // 测试配置变更
@@ -67,8 +74,10 @@ const ConfigMonitorTest = ({ monitorInitialized, updateStatus }) => {
     }
 
     // 模拟配置变更
-    const currentConfig = window.Monitor.getConfig();
-    updateStatus(`当前采样率: ${currentConfig.sampleRate}`, "info");
+    if (window.Monitor) {
+      const currentConfig = window.Monitor.getConfig();
+      updateStatus(`当前采样率: ${currentConfig.sampleRate}`, "info");
+    }
   };
 
   return (
