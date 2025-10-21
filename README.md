@@ -1,9 +1,28 @@
 # 前端监控 SDK
 
-一个轻量级、功能全面的前端监控 SDK，支持错误监控、性能监控、用户行为监控和数据上报。
+一个完整的前端监控解决方案，包含监控核心 SDK、数据可视化面板和测试试炼场。
 
-## 特性
+## 项目结构
 
+```
+前端监控 SDK/
+├── monitor-core/          # 监控核心 SDK
+│   └── monitor-sdk.js     # 监控 SDK 核心文件
+├── monitor-dashboard/     # 监控数据面板
+│   ├── server.js         # 数据接收服务器
+│   ├── index.html         # 面板主页面
+│   └── data/             # 监控数据存储
+└── monitor-playground/    # 监控测试试炼场
+    ├── src/              # React 组件源码
+    ├── index.html         # 测试页面入口
+    └── vite.config.js    # Vite 构建配置
+```
+
+## 核心功能模块
+
+### 1. monitor-core - 监控核心 SDK
+
+**功能特性：**
 - ✅ **错误监控**: JavaScript 运行时错误、Promise 异常、资源加载错误、接口请求错误
 - ✅ **性能监控**: 页面加载性能、资源加载耗时、Web Vitals 指标
 - ✅ **用户行为监控**: 点击事件、页面浏览、表单提交
@@ -12,17 +31,15 @@
 - ✅ **兼容性**: 支持主流浏览器，ES5+ 环境
 - ✅ **轻量化**: 压缩后约 8KB
 
-## 快速开始
-
-### 1. 引入 SDK
+**快速使用：**
 
 #### 方式一: Script 标签引入
 ```html
-<script src="./monitor/monitor-sdk.js"></script>
+<script src="./monitor-core/monitor-sdk.js"></script>
 <script>
     // 初始化监控
     Monitor.init({
-        reportUrl: 'https://your-api.com/report',
+        reportUrl: 'http://localhost:3001/report',
         appId: 'your-app-id',
         monitorErrors: true,
         monitorPerformance: true,
@@ -34,55 +51,86 @@
 
 #### 方式二: ES6 Module
 ```javascript
-import Monitor from './monitor/monitor-sdk.js';
+import Monitor from './monitor-core/monitor-sdk.js';
 
 Monitor.init({
-    reportUrl: 'https://your-api.com/report',
+    reportUrl: 'http://localhost:3001/report',
     appId: 'your-app-id',
     // ... 其他配置
 });
 ```
 
-### 2. 基础使用
+### 2. monitor-dashboard - 监控数据面板
 
-```javascript
-// 初始化监控
-Monitor.init({
-    reportUrl: 'https://your-api.com/report',
-    appId: 'your-app-id',
-    monitorErrors: true,
-    monitorPerformance: true,
-    monitorBehavior: true
-});
+**功能特性：**
+- 📊 **实时数据展示**: 错误统计、性能指标、用户行为分析
+- 🔔 **告警通知**: 异常事件实时告警
+- 📈 **趋势分析**: 数据趋势图表展示
+- 🔍 **详情查看**: 错误堆栈、性能详情查看
+- 💾 **数据存储**: 本地 JSON 文件存储
 
-// 手动上报错误
-try {
-    // 你的业务代码
-} catch (error) {
-    Monitor.reportError(error, {
-        customField: 'custom value'
-    });
-}
+**启动方式：**
+```bash
+# 安装依赖
+npm run dashboard:install
 
-// 手动上报性能数据
-Monitor.reportPerformance({
-    customMetric: 123
-});
+# 启动面板服务器
+npm run dashboard:dev
 
-// 手动上报用户行为
-Monitor.reportBehavior('custom_action', {
-    action: 'button_click',
-    element: 'submit_button'
-});
-
-// 立即上报所有数据
-Monitor.flush();
-
-// 销毁监控（页面卸载时自动调用）
-// Monitor.destroy();
+# 访问地址: http://localhost:3001
 ```
 
-## 配置参数
+### 3. monitor-playground - 监控测试试炼场
+
+**功能特性：**
+- 🧪 **功能测试**: 完整的监控功能测试页面
+- ⚡ **React 技术栈**: 基于 React 18 + Vite 的现代化测试环境
+- 🔧 **配置测试**: 支持不同配置场景测试
+- 📱 **响应式设计**: 适配不同设备尺寸
+
+**启动方式：**
+```bash
+# 安装依赖
+npm run playground:install
+
+# 启动开发服务器
+npm run playground:dev
+
+# 访问地址: http://localhost:4000
+```
+
+## 快速开始
+
+### 1. 安装项目依赖
+```bash
+# 安装根目录依赖
+npm install
+
+# 安装监控面板依赖
+npm run dashboard:install
+
+# 安装测试试炼场依赖
+npm run playground:install
+```
+
+### 2. 启动监控系统
+```bash
+# 同时启动面板和测试页面
+npm start
+
+# 或分别启动
+npm run dashboard:dev    # 面板: http://localhost:3001
+npm run playground:dev   # 测试: http://localhost:4000
+```
+
+### 3. 集成监控 SDK
+将 `monitor-core/monitor-sdk.js` 集成到你的项目中，配置上报地址为面板服务器地址。
+
+## 详细使用指南
+
+### 1. 监控核心 SDK 配置
+
+**基础配置参数：**
 
 | 参数 | 类型 | 默认值 | 描述 |
 |------|------|--------|------|
@@ -98,8 +146,7 @@ Monitor.flush();
 | `enableSourceMap` | boolean | false | 是否支持sourceMap |
 | `userBehavior` | object | {} | 用户行为监控配置 |
 
-### userBehavior 配置
-
+**用户行为监控配置：**
 ```javascript
 userBehavior: {
     click: true,        // 监控点击事件
@@ -108,10 +155,8 @@ userBehavior: {
 }
 ```
 
-### ignoreErrors 配置
-
+**错误忽略配置：**
 ```javascript
-// 忽略特定错误
 ignoreErrors: [
     'Script error',                    // 忽略跨域脚本错误
     /特定错误模式/,                   // 使用正则表达式
@@ -119,41 +164,79 @@ ignoreErrors: [
 ]
 ```
 
-## API 参考
+### 2. 监控面板使用
 
-### Monitor.init(config)
+监控面板提供实时数据可视化功能：
+
+- **错误统计**: 查看各类错误的发生频率和趋势
+- **性能指标**: 监控页面加载性能关键指标
+- **用户行为**: 分析用户交互行为模式
+- **详情查看**: 点击具体数据项查看详细堆栈信息
+
+### 3. 测试试炼场功能
+
+测试试炼场包含完整的监控功能测试：
+
+- **错误测试**: 触发不同类型错误验证监控效果
+- **性能测试**: 测试页面性能数据采集
+- **配置测试**: 验证不同配置参数的效果
+- **集成测试**: 测试 SDK 与面板的集成效果
+
+## 开发指南
+
+### 1. 监控核心 SDK 开发
+
+**API 参考：**
+
+#### Monitor.init(config)
 初始化监控 SDK。
 
-### Monitor.reportError(error, customData)
+#### Monitor.reportError(error, customData)
 手动上报错误。
 - `error`: Error 对象
 - `customData`: 自定义数据
 
-### Monitor.reportPerformance(metrics, customData)
+#### Monitor.reportPerformance(metrics, customData)
 手动上报性能数据。
 - `metrics`: 性能指标对象
 - `customData`: 自定义数据
 
-### Monitor.reportBehavior(behaviorType, data)
+#### Monitor.reportBehavior(behaviorType, data)
 手动上报用户行为。
 - `behaviorType`: 行为类型
 - `data`: 行为数据
 
-### Monitor.flush()
+#### Monitor.flush()
 立即上报所有待上报数据。
 
-### Monitor.destroy()
+#### Monitor.destroy()
 销毁监控实例，清理所有监听器。
 
-### Monitor.getConfig()
+#### Monitor.getConfig()
 获取当前配置。
 
-### Monitor.isInitialized()
+#### Monitor.isInitialized()
 检查是否已初始化。
 
-## 监控数据类型
+### 2. 监控面板开发
 
-### 错误监控数据
+监控面板基于 Node.js + Express 开发，支持：
+- 实时数据接收和存储
+- WebSocket 实时数据推送
+- 数据可视化图表展示
+- 错误详情查看功能
+
+### 3. 测试试炼场开发
+
+测试试炼场基于 React 18 + Vite 开发，提供：
+- 完整的监控功能测试界面
+- 响应式设计适配
+- 实时状态反馈
+- 配置参数动态调整
+
+## 数据格式说明
+
+### 1. 错误监控数据格式
 ```javascript
 {
     type: 'js_error' | 'promise_error' | 'resource_error' | 'api_error',
@@ -163,11 +246,13 @@ ignoreErrors: [
     lineno: 行号,
     colno: 列号,
     errorType: '错误类型',
+    timestamp: '时间戳',
+    appId: '应用标识',
     // ... 其他字段
 }
 ```
 
-### 性能监控数据
+### 2. 性能监控数据格式
 ```javascript
 {
     type: 'performance' | 'resource_performance' | 'web_vital',
@@ -180,11 +265,13 @@ ignoreErrors: [
         fcp: 首次内容渲染时间,
         loadComplete: 页面完全加载时间
     },
+    timestamp: '时间戳',
+    url: '页面URL',
     // ... 其他字段
 }
 ```
 
-### 用户行为数据
+### 3. 用户行为数据格式
 ```javascript
 {
     type: 'click' | 'page_view' | 'form_submit',
@@ -194,11 +281,15 @@ ignoreErrors: [
     id: '元素ID',
     x: '点击X坐标',
     y: '点击Y坐标',
+    timestamp: '时间戳',
+    pageUrl: '页面URL',
     // ... 其他字段
 }
 ```
 
-## 浏览器兼容性
+## 技术规格
+
+### 浏览器兼容性
 
 | 浏览器 | 最低版本 | 备注 |
 |--------|----------|------|
@@ -207,6 +298,13 @@ ignoreErrors: [
 | Safari | 10+ | 完全支持 |
 | Edge | 79+ | 完全支持 |
 | IE | 11 | 部分支持（需polyfill） |
+
+### 性能指标
+
+- **SDK 大小**: 压缩后约 8KB
+- **内存占用**: 轻量级设计，内存占用低
+- **上报延迟**: 支持批量上报，减少网络请求
+- **数据精度**: 毫秒级时间戳精度
 
 ## 注意事项
 
@@ -231,52 +329,46 @@ ignoreErrors: [
 ### 5. 隐私保护
 默认不收集敏感信息，可根据需要配置过滤规则。
 
-## 开发指南
+## 构建和部署
 
-### 构建和压缩
+### 1. 监控核心 SDK 构建
+```bash
+# 压缩 SDK 代码
+npm run build:monitor-sdk
+
+# 输出文件: monitor-core/monitor-sdk.min.js
+```
+
+### 2. 监控面板部署
 ```bash
 # 安装依赖
-npm install -g uglify-js
+npm run dashboard:install
 
-# 压缩代码
-uglifyjs monitor/monitor-sdk.js -o monitor/monitor-sdk.min.js -c -m
+# 启动生产服务器
+npm run dashboard:start
+
+# 访问地址: http://localhost:3001
 ```
 
-### 测试
-```javascript
-// 测试错误监控
-throw new Error('测试错误');
+### 3. 测试试炼场构建
+```bash
+# 构建生产版本
+npm run playground:build
 
-// 测试性能监控
-// 在页面加载完成后查看控制台输出
+# 预览构建结果
+npm run playground:preview
 
-// 测试用户行为监控
-// 点击页面元素查看上报数据
+# 输出目录: monitor-playground/dist/
 ```
 
-## 故障排除
+## 测试指南
 
-### 常见问题
+### 1. 使用测试试炼场
+访问 `http://localhost:4000` 进行完整的功能测试：
 
-**Q: 监控未初始化？**
-A: 检查 `reportUrl` 是否配置正确。
+- **错误测试**: 点击"触发错误"按钮测试错误监控
+- **性能测试**: 查看页面性能指标采集
+- **配置测试**: 动态调整配置参数验证效果
 
-**Q: 数据未上报？**
-A: 检查网络连接和上报地址是否可达。
-
-**Q: 错误堆栈信息不全？**
-A: 检查是否为跨域脚本错误，或启用 SourceMap 支持。
-
-**Q: 性能数据不准确？**
-A: 确保在页面完全加载后采集性能数据。
-
-## 更新日志
-
-### v1.0.0 (2024-01-01)
-- 初始版本发布
-- 支持错误监控、性能监控、用户行为监控
-- 支持灵活的数据上报策略
-
-## 许可证
-
-MIT License
+### 2. 集成测试
+将 SDK 集成到你的项目中，配置上报地址为面板服务器地址，验证数据接收和展示效果。
