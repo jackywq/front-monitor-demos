@@ -70,3 +70,33 @@ export interface ChartData {
   name: string;
   value: number;
 }
+
+// 用户行为详情
+export interface BehaviorDetail {
+  id: string;
+  behaviorType: string;
+  timestamp: string;
+  appId?: string;
+  pageUrl?: string;
+  userAgent?: string;
+  userId?: string;
+  username?: string;
+  formId?: string;
+  messageLength?: number;
+  [key: string]: any; // 支持其他自定义字段
+}
+
+// 用户行为统计
+export interface BehaviorStats {
+  stats: Array<{
+    userId?: string;
+    total: number;
+    behaviors: Record<string, number>;
+    latestActivity: string;
+    time?: string;
+    uniqueUsers?: number;
+  }>;
+  total: number;
+  groupBy: "user" | "time";
+  timeGranularity?: "hour" | "day" | "week";
+}

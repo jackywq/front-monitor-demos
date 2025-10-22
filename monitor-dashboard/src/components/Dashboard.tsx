@@ -9,6 +9,7 @@ import ErrorTypeChart from './charts/ErrorTypeChart';
 import PerformanceChart from './charts/PerformanceChart';
 import PerformanceDistributionChart from './charts/PerformanceDistributionChart';
 import UserBehaviorChart from './charts/UserBehaviorChart';
+import EnhancedUserBehaviorChart from './charts/EnhancedUserBehaviorChart';
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<MonitorStats | null>(null);
@@ -111,6 +112,13 @@ const Dashboard: React.FC = () => {
         </Row>
 
         {/* 用户行为图表 */}
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <EnhancedUserBehaviorChart data={stats} height={400} />
+          </Col>
+        </Row>
+
+        {/* 原始用户行为图表（可选） */}
         <Row gutter={[16, 16]}>
           <Col span={24}>
             <Card>

@@ -331,6 +331,164 @@ app.get("/api/performance", (req, res) => {
   }
 });
 
+// 获取用户行为详情列表
+app.get("/api/behaviors", (req, res) => {
+  try {
+    const behaviors = fs.readJsonSync(BEHAVIOR_FILE);
+    const limit = parseInt(req.query.limit) || 100;
+    const behaviorType = req.query.type;
+    const userId = req.query.userId;
+    const startTime = req.query.startTime;
+    const endTime = req.query.endTime;
+
+    let result = behaviors.sort(
+      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+    );
+
+    // 按行为类型筛选
+    if (behaviorType) {
+      result = result.filter((behavior) => behavior.behaviorType === behaviorType);
+    }
+
+    // 按用户ID筛选
+    if (userId) {
+      result = result.filter((behavior) => behavior.userId === userId);
+    }
+
+    // 按时间范围筛选
+    if (startTime && endTime) {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+      result = result.filter((behavior) => {
+        const behaviorTime = new Date(behavior.timestamp);
+        return behaviorTime >= start && behaviorTime <= end;
+      });
+    }
+
+    result = result.slice(0, limit);
+
+    res.json(result);
+  } catch (error) {
+    console.error("获取用户行为列表失败:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get behavior data",
+    });
+  }
+});
+
+// 获取用户行为统计（按用户和时间维度）
+app.get("/api/behavior-stats", (req, res) => {
+  try {
+    const behaviors = fs.readJsonSync(BEHAVIOR_FILE);
+    const groupBy = req.query.groupBy || "user"; // "user" 或 "time"
+    const timeGranularity = req.query.timeGranularity || "hour"; // "hour", "day", "week"
+    const startTime = req.query.startTime;
+    const endTime = req.query.endTime;
+
+    let filteredBehaviors = behaviors;
+
+    // 按时间范围筛选
+    if (startTime && endTime) {
+      const start = new Date(startTime);
+      const end = new Date(endTime);
+      filteredBehaviors = behaviors.filter((behavior) => {
+        const behaviorTime = new Date(behavior.timestamp);
+        return behaviorTime >= start && behaviorTime <= end;
+      });
+    }
+
+    let stats = {};
+
+    if (groupBy === "user") {
+      // 按用户统计
+      filteredBehaviors.forEach((behavior) => {
+        const userKey = behavior.userId || behavior.username || "匿名用户";
+        if (!stats[userKey]) {
+          stats[userKey] = {
+            total: 0,
+            behaviors: {},
+            latestActivity: behavior.timestamp,
+          };
+        }
+        
+        stats[userKey].total += 1;
+        const behaviorType = behavior.behaviorType;
+        stats[userKey].behaviors[behaviorType] = (stats[userKey].behaviors[behaviorType] || 0) + 1;
+        
+        // 更新最新活动时间
+        if (new Date(behavior.timestamp) > new Date(stats[userKey].latestActivity)) {
+          stats[userKey].latestActivity = behavior.timestamp;
+        }
+      });
+
+      // 转换为数组并排序
+      stats = Object.entries(stats)
+        .map(([userId, data]) => ({
+          userId,
+          ...data,
+        }))
+        .sort((a, b) => b.total - a.total);
+
+    } else if (groupBy === "time") {
+      // 按时间统计
+      filteredBehaviors.forEach((behavior) => {
+        const behaviorTime = new Date(behavior.timestamp);
+        let timeKey;
+
+        if (timeGranularity === "hour") {
+          timeKey = behaviorTime.toISOString().slice(0, 13) + ":00:00";
+        } else if (timeGranularity === "day") {
+          timeKey = behaviorTime.toISOString().slice(0, 10);
+        } else if (timeGranularity === "week") {
+          const weekStart = new Date(behaviorTime);
+          weekStart.setDate(behaviorTime.getDate() - behaviorTime.getDay());
+          timeKey = weekStart.toISOString().slice(0, 10);
+        }
+
+        if (!stats[timeKey]) {
+          stats[timeKey] = {
+            total: 0,
+            behaviors: {},
+            users: new Set(),
+          };
+        }
+
+        stats[timeKey].total += 1;
+        const behaviorType = behavior.behaviorType;
+        stats[timeKey].behaviors[behaviorType] = (stats[timeKey].behaviors[behaviorType] || 0) + 1;
+        
+        // 统计用户数
+        const userId = behavior.userId || behavior.username || "匿名用户";
+        stats[timeKey].users.add(userId);
+      });
+
+      // 转换Set为数组长度，并排序
+      stats = Object.entries(stats)
+        .map(([timeKey, data]) => ({
+          time: timeKey,
+          total: data.total,
+          behaviors: data.behaviors,
+          uniqueUsers: data.users.size,
+        }))
+        .sort((a, b) => new Date(a.time) - new Date(b.time));
+    }
+
+    res.json({
+      stats,
+      total: filteredBehaviors.length,
+      groupBy,
+      timeGranularity: groupBy === "time" ? timeGranularity : undefined,
+    });
+  } catch (error) {
+    console.error("获取用户行为统计失败:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get behavior stats",
+    });
+  }
+});
+
 // 健康检查接口
 app.get("/api/health", (req, res) => {
   res.json({
