@@ -9,8 +9,8 @@ export default defineConfig({
     open: true,
     // 配置代理，让监控SDK文件可以从monitor-core目录访问
     fs: {
-      allow: ['..'] // 允许访问父目录
-    }
+      allow: [".."], // 允许访问父目录
+    },
   },
   build: {
     outDir: "dist",

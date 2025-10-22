@@ -19,7 +19,7 @@ const MonitorInitialization: React.FC<MonitorInitializationProps> = ({
   const initMonitor = () => {
     if (window.Monitor) {
       window.Monitor.init({
-        reportUrl: "https://httpbin.org/post",
+        reportUrl: "http://localhost:3001/api/report",
         appId: "demo-app",
         monitorErrors: true,
         monitorPerformance: true,

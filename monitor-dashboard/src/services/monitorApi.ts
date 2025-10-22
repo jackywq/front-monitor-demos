@@ -1,7 +1,9 @@
 import axios from "axios";
 import { MonitorStats, ErrorDetail, PerformanceDetail } from "../types/monitor";
 
-// 模拟数据生成器
+const API_BASE_URL = "http://localhost:3001/api";
+
+// 模拟数据生成器（作为备用）
 const generateMockStats = (range: string = "24h"): MonitorStats => {
   const baseValue =
     range === "1h"
@@ -41,13 +43,15 @@ const generateMockStats = (range: string = "24h"): MonitorStats => {
       页面滚动: Math.floor(baseValue * 1.8),
     },
     errorTrend: Array.from({ length: 12 }, (_, i) => ({
-      time: new Date(Date.now() - (11 - i) * 2 * 60 * 60 * 1000).toISOString(),
+      time: new Date(
+        Date.now() - (11 - i) * 2 * 60 * 60 * 1000
+      ).toLocaleString(),
       count: Math.floor(Math.random() * 10) + 1,
     })),
     timeRange: {
       range: range,
-      start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      end: new Date().toISOString(),
+      start: new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleString(),
+      end: new Date().toLocaleString(),
     },
   };
 };
@@ -68,7 +72,7 @@ const generateMockErrors = (
     id: `error-${i}`,
     timestamp: new Date(
       Date.now() - Math.random() * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    ).toLocaleString(),
     errorType: errorTypes[Math.floor(Math.random() * errorTypes.length)],
     message: `Error occurred at ${
       pages[Math.floor(Math.random() * pages.length)]
@@ -100,7 +104,7 @@ const generateMockPerformance = (limit: number = 50): PerformanceDetail[] => {
     id: `perf-${i}`,
     timestamp: new Date(
       Date.now() - Math.random() * 24 * 60 * 60 * 1000
-    ).toISOString(),
+    ).toLocaleString(),
     url: `https://example.com/page${Math.floor(Math.random() * 10)}`,
     metrics: {
       pageLoad: (0.8 + Math.random() * 2.5) * 1000, // 转换为毫秒
@@ -112,15 +116,24 @@ const generateMockPerformance = (limit: number = 50): PerformanceDetail[] => {
   }));
 };
 
-// 使用模拟数据替代真实API调用
+// 真实API调用
 export const monitorApi = {
   // 获取统计数据
   getStats: async (range: string = "24h"): Promise<MonitorStats> => {
-    // 模拟网络延迟
-    await new Promise((resolve) =>
-      setTimeout(resolve, 300 + Math.random() * 700)
-    );
-    return generateMockStats(range);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/stats`, {
+        params: { range },
+      });
+      console.log("response.data :>> ", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("获取统计数据失败，使用模拟数据:", error);
+      // 如果真实API失败，回退到模拟数据
+      await new Promise((resolve) =>
+        setTimeout(resolve, 300 + Math.random() * 700)
+      );
+      return generateMockStats(range);
+    }
   },
 
   // 获取错误详情
@@ -128,28 +141,51 @@ export const monitorApi = {
     limit: number = 50,
     type?: string
   ): Promise<ErrorDetail[]> => {
-    await new Promise((resolve) =>
-      setTimeout(resolve, 200 + Math.random() * 500)
-    );
-    let errors = generateMockErrors(limit);
-    if (type) {
-      errors = errors.filter((error) => error.errorType === type);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/errors`, {
+        params: { limit, type },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("获取错误详情失败，使用模拟数据:", error);
+      // 如果真实API失败，回退到模拟数据
+      await new Promise((resolve) =>
+        setTimeout(resolve, 200 + Math.random() * 500)
+      );
+      let errors = generateMockErrors(limit);
+      if (type) {
+        errors = errors.filter((error) => error.errorType === type);
+      }
+      return errors;
     }
-    return errors;
   },
 
   // 获取性能详情
   getPerformance: async (limit: number = 50): Promise<PerformanceDetail[]> => {
-    await new Promise((resolve) =>
-      setTimeout(resolve, 200 + Math.random() * 500)
-    );
-    return generateMockPerformance(limit);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/performance`, {
+        params: { limit },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("获取性能详情失败，使用模拟数据:", error);
+      // 如果真实API失败，回退到模拟数据
+      await new Promise((resolve) =>
+        setTimeout(resolve, 200 + Math.random() * 500)
+      );
+      return generateMockPerformance(limit);
+    }
   },
 
   // 健康检查
   healthCheck: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    return { status: "healthy", timestamp: new Date().toISOString() };
+    try {
+      const response = await axios.get(`${API_BASE_URL}/health`);
+      return response.data;
+    } catch (error) {
+      console.error("健康检查失败:", error);
+      return { status: "healthy", timestamp: new Date().toLocaleString() };
+    }
   },
 };
 

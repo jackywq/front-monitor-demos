@@ -1,0 +1,25 @@
+[
+  {
+    "type": "js_error",
+    "message": "Test error from curl",
+    "errorType": "TypeError",
+    "timestamp": "2025-10-22T02:46:32.3NZ",
+    "id": "monitor_1761101192238_q8r620r5g",
+    "appId": "test-app",
+    "pageUrl": "http://localhost:4001",
+    "userAgent": "Mozilla/5.0"
+  },
+  {
+    "type": "js_error",
+    "errorType": "ReferenceError",
+    "message": "test is not defined",
+    "filename": "test.js",
+    "lineno": 10,
+    "colno": 5,
+    "timestamp": "2025-10-22T02:50:00.000Z",
+    "appId": "test-app",
+    "pageUrl": "http://localhost:4001/test",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "id": "monitor_1761101273647_fz9rk4fun"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "type": "custom_behavior",
+    "behaviorType": "test_click",
+    "timestamp": "2025-10-22T03:12:03.3NZ",
+    "appId": "test-app",
+    "id": "monitor_1761102723829_vxjp7thqe"
+  },
+  {
+    "type": "custom_behavior",
+    "behaviorType": "form_submit",
+    "formId": "demo_form",
+    "username": "1379018128@qq.com",
+    "email": "wangquan.uiho@btyedance.com",
+    "messageLength": 12,
+    "timestamp": 1761102966520,
+    "id": "monitor_1761102969391_ute6wda46",
+    "appId": "demo-app",
+    "pageUrl": "http://localhost:4001/",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  },
+  {
+    "type": "custom_behavior",
+    "behaviorType": "form_submit",
+    "formId": "demo_form",
+    "username": "周杰伦",
+    "email": "8888888888@qq.com",
+    "messageLength": 24,
+    "timestamp": 1761103021479,
+    "id": "monitor_1761103024389_kchd2s34g",
+    "appId": "demo-app",
+    "pageUrl": "http://localhost:4001/",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  }
+]
