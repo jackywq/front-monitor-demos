@@ -124,7 +124,6 @@ export const monitorApi = {
       const response = await axios.get(`${API_BASE_URL}/stats`, {
         params: { range },
       });
-      console.log("response.data :>> ", response.data);
       return response.data;
     } catch (error) {
       console.error("获取统计数据失败，使用模拟数据:", error);

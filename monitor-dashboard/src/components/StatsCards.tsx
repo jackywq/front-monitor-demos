@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, Row, Col, Statistic, Tag } from 'antd';
-import { MonitorStats } from '../types/monitor';
+import React from "react";
+import { Card, Row, Col, Statistic, Tag } from "antd";
+import { MonitorStats } from "../types/monitor";
 
 interface StatsCardsProps {
   data: MonitorStats;
@@ -14,8 +14,12 @@ const StatsCards: React.FC<StatsCardsProps> = ({ data }) => {
           <Statistic
             title="总错误数"
             value={data.totalErrors}
-            valueStyle={{ color: data.totalErrors > 0 ? '#cf1322' : '#3f8600' }}
-            prefix={<Tag color={data.totalErrors > 0 ? 'red' : 'green'}>{data.totalErrors > 0 ? '异常' : '正常'}</Tag>}
+            valueStyle={{ color: data.totalErrors > 0 ? "#cf1322" : "#3f8600" }}
+            prefix={
+              <Tag color={data.totalErrors > 0 ? "red" : "green"}>
+                {data.totalErrors > 0 ? "异常" : "正常"}
+              </Tag>
+            }
           />
         </Card>
       </Col>
@@ -24,7 +28,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ data }) => {
           <Statistic
             title="总用户数"
             value={data.totalUsers}
-            valueStyle={{ color: '#1890ff' }}
+            valueStyle={{ color: "#1890ff" }}
           />
         </Card>
       </Col>
@@ -32,9 +36,16 @@ const StatsCards: React.FC<StatsCardsProps> = ({ data }) => {
         <Card>
           <Statistic
             title="成功率"
-            value={data.successRate}
+            value={data.successRate.toFixed(2)}
             suffix="%"
-            valueStyle={{ color: data.successRate >= 95 ? '#3f8600' : data.successRate >= 90 ? '#faad14' : '#cf1322' }}
+            valueStyle={{
+              color:
+                data.successRate >= 95
+                  ? "#3f8600"
+                  : data.successRate >= 90
+                  ? "#faad14"
+                  : "#cf1322",
+            }}
           />
         </Card>
       </Col>
@@ -42,9 +53,16 @@ const StatsCards: React.FC<StatsCardsProps> = ({ data }) => {
         <Card>
           <Statistic
             title="页面加载时间"
-            value={data.performanceMetrics.pageLoad}
+            value={data.performanceMetrics.pageLoad.toFixed(2)}
             suffix="ms"
-            valueStyle={{ color: data.performanceMetrics.pageLoad < 1000 ? '#3f8600' : data.performanceMetrics.pageLoad < 3000 ? '#faad14' : '#cf1322' }}
+            valueStyle={{
+              color:
+                data.performanceMetrics.pageLoad < 1000
+                  ? "#3f8600"
+                  : data.performanceMetrics.pageLoad < 3000
+                  ? "#faad14"
+                  : "#cf1322",
+            }}
           />
         </Card>
       </Col>

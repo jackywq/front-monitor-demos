@@ -27,7 +27,6 @@ export class Monitor {
 
     // 合并配置
     this.config = deepMerge({}, DEFAULT_CONFIG);
-    console.log("🚀 ~ Monitor ~ init ~ this.config:", this.config);
     deepMerge(this.config, userConfig);
 
     // 验证必要配置
