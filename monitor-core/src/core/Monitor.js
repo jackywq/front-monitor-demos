@@ -2,11 +2,11 @@
  * 主监控类
  */
 
-import { DataQueue } from './DataQueue.js';
-import { ErrorMonitor } from '../modules/ErrorMonitor.js';
-import { PerformanceMonitor } from '../modules/PerformanceMonitor.js';
-import { BehaviorMonitor } from '../modules/BehaviorMonitor.js';
-import { DEFAULT_CONFIG, deepMerge } from '../utils/index.js';
+import { DataQueue } from "./DataQueue.js";
+import { ErrorMonitor } from "../modules/ErrorMonitor.js";
+import { PerformanceMonitor } from "../modules/PerformanceMonitor.js";
+import { BehaviorMonitor } from "../modules/BehaviorMonitor.js";
+import { DEFAULT_CONFIG, deepMerge } from "../utils/index.js";
 
 export class Monitor {
   constructor() {
@@ -27,6 +27,7 @@ export class Monitor {
 
     // 合并配置
     this.config = deepMerge({}, DEFAULT_CONFIG);
+    console.log("🚀 ~ Monitor ~ init ~ this.config:", this.config);
     deepMerge(this.config, userConfig);
 
     // 验证必要配置
