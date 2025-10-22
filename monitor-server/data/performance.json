@@ -1,1 +1,38 @@
-[{"type":"performance","navigationType":"reload","metrics":{"dnsLookup":0,"tcpConnect":0,"requestResponse":4,"domParse":321,"firstPaint":9,"fcp":237,"loadComplete":333},"timestamp":1761102959382,"id":"monitor_1761102960542_ra6nmwkat","appId":"demo-app","pageUrl":"http://localhost:4001/","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"}]
+[
+  {
+    "type": "performance",
+    "navigationType": "reload",
+    "metrics": {
+      "dnsLookup": 0,
+      "tcpConnect": 0,
+      "requestResponse": 4,
+      "domParse": 321,
+      "firstPaint": 9,
+      "fcp": 237,
+      "loadComplete": 333
+    },
+    "timestamp": 1761102959382,
+    "id": "monitor_1761102960542_ra6nmwkat",
+    "appId": "demo-app",
+    "pageUrl": "http://localhost:4001/",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  },
+  {
+    "type": "performance",
+    "navigationType": "navigate",
+    "metrics": {
+      "dnsLookup": 0,
+      "tcpConnect": 0,
+      "requestResponse": 7,
+      "domParse": 365,
+      "firstPaint": 15,
+      "fcp": 269,
+      "loadComplete": 384
+    },
+    "timestamp": 1761115654841,
+    "id": "monitor_1761115655657_u5lhv2zek",
+    "appId": "demo-app",
+    "pageUrl": "http://localhost:4000/",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  }
+]
