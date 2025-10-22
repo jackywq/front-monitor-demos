@@ -7,6 +7,7 @@ import ErrorMonitorTest from "./components/ErrorMonitorTest";
 import PerformanceMonitorTest from "./components/PerformanceMonitorTest";
 import BehaviorMonitorTest from "./components/BehaviorMonitorTest";
 import ConfigMonitorTest from "./components/ConfigMonitorTest";
+import TimedUploadControl from "./components/TimedUploadControl";
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -83,6 +84,14 @@ const App: React.FC<AppProps> = () => {
             <MonitorInitialization
               monitorInitialized={monitorInitialized}
               setMonitorInitialized={setMonitorInitialized}
+              updateStatus={updateStatus}
+            />
+          </Col>
+
+          {/* 定时上传控制组件 */}
+          <Col xs={24} lg={12}>
+            <TimedUploadControl
+              monitorInitialized={monitorInitialized}
               updateStatus={updateStatus}
             />
           </Col>
